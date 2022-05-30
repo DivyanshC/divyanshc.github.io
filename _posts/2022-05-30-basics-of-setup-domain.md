@@ -7,7 +7,7 @@ tags: [homelab, servers] # tag names should always be lowercase
 
 # Basics and setting up new domain
 
-## That is a domain?
+## What is a domain?
 
 For Example for *https://www.divyashchauhan.com*
 
