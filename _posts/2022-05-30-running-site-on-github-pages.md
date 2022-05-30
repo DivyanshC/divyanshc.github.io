@@ -51,6 +51,8 @@ theme_mode: dark
 avatar: <URL-of-Profile-Photo>
 ```
 
+Profile photo url can be taken from facebook, twitter.
+
 ## Adding a new post to your site:
 
 create a new file in the `_posts` directory.
@@ -105,6 +107,67 @@ Check the **Actions tab** on your repo for more information.
 - Check Enforce HTTPS
 
 Your site will be available at **https://\<YOUR-USER-NAME>.github.io/**
+
+## Adding Custom Domain
+
+You can add an apex domain or sub-domain of your site. Github will redirect the traffic to your site from **https://\<YOUR-USER-NAME>.github.io/** also.
+
+Got to Settings > Pages > Custom Domain > Add your custom domain name > Save
+
+Create `A` records, point your apex domain to the IP addresses for GitHub Pages.
+
+Add new record:
+
+- Type: **A**
+- Name: **@** for no subdomain or subdomain name
+- IP Address: **<IP-ADDRESS-OF-GITHUB-PAGES>**
+
+```Text
+185.199.108.153
+185.199.109.153
+185.199.110.153
+185.199.111.153
+```
+
+Add records with all four using name as **@** and **www** subdomain.
+
+### Check if DNS configuration is correct:
+
+```bash
+dig DIVYANSHCHAUHAN.COM +noall +answer -t A
+```
+
+If _cloudflare_ is your nameserver then you will see some cloudflare IP addresses not of github pages that we added.
+
+This will commit a cname file in 'gh-pages' branch which will get removed after new commit takes place so update it in config.yml file.
+
+```yaml
+url: "https://divyanshchauhan.com"
+```
+
+This will add a cname file in 'gh-pages' branch **automatically** on commit.
+
+Check **Enforce HTTPS** field in repo Settings > Pages. (It can take upto 24 hours before this option is available.)
+
+## Verify you Domain in Github
+
+This will only allow your github account to host site using github pages on this verified domain or its subdomains.
+
+Got to github main Settings under Profile > Code, planning, and automation > Pages > Add domain.
+
+Follow the process to add a domain.
+
+Check if TXT record added in DNS.
+
+```bash
+dig _github-pages-challenge-USERNAME.example.com +nostats +nocomments +nocmd TXT
+```
+
+USERNAME: **\<YOUR-GITHUB-USER-NAME>**
+
+example: **\<YOUR-DOMAIN-NAME>**
+
+Check [Github Docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site#configuring-an-apex-domain) for more information on how to setup custom domain.
 
 ## Self Hoting the site
 
