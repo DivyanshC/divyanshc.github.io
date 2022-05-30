@@ -89,7 +89,7 @@ This will start the server on port 4000. http://127.0.0.1:4000/ will be your sit
 ```bash
 git add .
 git commit -m "feat(post): <POST-TITLE>"
-git push
+git push origin main
 ```
 
 This site already has github actions configured, this uses CI/CD to automatically get your site from the main branch by updating gh-pages branch.
