@@ -1,8 +1,8 @@
 ---
 title: Setting up your new domain
 date: 2022-05-30 18:33:00 +0530
-categories: [homelab, github-pages]
-tags: [homelab, servers] # tag names should always be lowercase
+categories: [homelab, domain, cloudflare]
+tags: [homelab, domain, cloudflare, new-domain-setup] # tag names should always be lowercase
 ---
 
 # Basics and setting up new domain
