@@ -36,9 +36,17 @@ Now in **DNS** section, if you have some a records pointing to some ip address t
 
 ## SSL/TLS Section
 
-Select **Full (Srtict)** or Full Mode
+Under Overview:
 
-If full strict is selected then check your website if invalid SSL error occurs then got with **full** mode.
+- Select **Full (Srtict)** or Full Mode
+
+- If full strict is selected then check your website if invalid SSL error occurs then got with **full** mode.
+
+- Check SSL/TLS Recommender.
+
+Under Edge Certificates:
+
+- Check Always Use HTTPS
 
 ## Email Forwarding
 
