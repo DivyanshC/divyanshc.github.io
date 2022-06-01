@@ -110,6 +110,8 @@ Your site will be available at **https://\<YOUR-USER-NAME>.github.io/**
 
 ## Adding Custom Domain
 
+### <u>Apex Domain</u> :
+
 You can add an apex domain or sub-domain of your site. Github will redirect the traffic to your site from **https://\<YOUR-USER-NAME>.github.io/** also.
 
 Got to Settings > Pages > Custom Domain > Add your custom domain name > Save
@@ -148,6 +150,26 @@ url: "https://divyanshchauhan.com"
 This will add a cname file in 'gh-pages' branch **automatically** on commit.
 
 Check **Enforce HTTPS** field in repo Settings > Pages. (It can take upto 24 hours before this option is available.)
+
+### <u>Sub-Domain</u>:
+
+Add a CNAME record in cloudflare DNS for your sub-domain.
+
+Add new record:
+
+- subdomain name: **\<SUB-DOMAIN-NAME>** (e.g. **docs**)
+
+- IPv4 address: **https://\<YOUR-USER-NAME>.github.io/** (e.g. **https://divyanshc.github.io/**)
+
+On Github Repo > Got to Settings > Pages > Custom Domain > Add your custom domain name > Save
+
+- custom domain name: **\<SUB-DOMAIN-NAME>.divyanshchauhan.com** (e.g. **docs.divyanshchauhan.com**)
+
+Add this to config.yml file:
+
+```yaml
+url: "https://docs.divyanshchauhan.com"
+```
 
 ## Verify you Domain in Github
 
