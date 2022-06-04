@@ -232,7 +232,7 @@ This certificate will only last upto 3 months then we have to renew it.
 To Check IP of your docker container use the following command in your terminal :
 
 ```bash
-docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <CONTAINER_NAME>
+docker inspect <CONTAINER_NAME_OR_ID> | grep '"IPAddress"' | tail -n1
 ```
 
 - Port will be the **internal** port of the service which is running in docker (8080:80 then **80**) or the service port when not running in docker.
