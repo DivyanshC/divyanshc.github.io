@@ -9,7 +9,7 @@ tags: [homelab, domain, cloudflare, new-domain-setup] # tag names should always 
 
 ## What is a domain?
 
-For Example for *https://www.divyashchauhan.com*
+For Example for _https://www.divyashchauhan.com_
 
 - **http/https** : protocols
 - **www** : subdomain
@@ -38,9 +38,13 @@ Now in **DNS** section, if you have some a records pointing to some ip address t
 
 Under Overview:
 
-- Select **Full (Srtict)** or Full Mode
+- Best if **Full** (It encrypts both sides of the communication. Client to website and website to server.)
 
-- If full strict is selected then check your website if invalid SSL error occurs then got with **full** mode.
+- Select **Full (Srtict)** (It will only work when you have Cloudflare SSL cetificate installed on server also)
+
+- If full strict is selected then check your website if invalid SSL error occurs then go with **full** mode.
+
+- **Flexible** means only client to website is encrypted.
 
 - Check SSL/TLS Recommender.
 
