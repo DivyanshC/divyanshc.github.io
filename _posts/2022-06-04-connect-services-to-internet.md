@@ -1,8 +1,37 @@
 ---
 title: Connecting services to internet using encrypted methods
 date: 2022-06-04 16:33:00 +0530
-categories: [homelab, domain, cloudflare, services, internet, traefik, nginx, letsencrypt, tunnel, ssl, tls, email, forward]
-tags: [homelab, domain, cloudflare, services, internet, traefik, nginx, letsencrypt, , tunnel, ssl, tls, email, forward] # tag names should always be lowercase
+categories:
+  [
+    homelab,
+    domain,
+    cloudflare,
+    services,
+    internet,
+    traefik,
+    nginx,
+    letsencrypt,
+    tunnel,
+    ssl,
+    tls,
+    email,
+    forward,
+  ]
+tags: [
+    homelab,
+    domain,
+    cloudflare,
+    services,
+    internet,
+    traefik,
+    nginx,
+    letsencrypt,
+    tunnel,
+    ssl,
+    tls,
+    email,
+    forward,
+  ] # tag names should always be lowercase
 ---
 
 # Exposing your services to the internet using SSL
