@@ -54,4 +54,4 @@ Under Edge Certificates:
 
 ## Email Forwarding
 
-Can set up email forwarding for your custom domain email address like `help.divyanshchauhan.com` to your email address.
+Can set up email forwarding for your custom domain email address like `connect@divyanshchauhan.com` to your email address.
