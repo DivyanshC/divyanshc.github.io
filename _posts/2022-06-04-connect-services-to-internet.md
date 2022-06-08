@@ -42,6 +42,14 @@ Here comes the part of **reverse proxy** and **cloudflare tunnel**.
 
 We have different **services** running at different ports and we want to expose them to the internet on different apex domains and sub domains.
 
+### <u>DNS Entry</u>
+
+You will have to **point** your domain or subdomain on your DNS to the server on which you will run your services using reverse proxy. No need to do this if you are using a **cloudflare tunnel**.
+
+Add a DNS **A** record for the apex domain and point it to your server's IP address.
+
+If your apex domain point to a server, you also want your subdomain to point to that same server then add a **CNAME** record for the subdomain and point it to the apex domain.
+
 # 1. Cloudflare Tunnel
 
 It is the easiest of them all.
@@ -124,6 +132,8 @@ Then try restarting the cloudflared service again.
 
 There are many reverse proxy managers available like **nginx proxy manager**, **traefik** etc.
 
+For this you will need your domain or subdomain to point to your server's IP address. See this [DNS Entry section](#dns-entry).
+
 ## 1. Installing Nginx Proxy Manager
 
 - Open the [ installation guide](https://nginxproxymanager.com/guide/).
@@ -196,7 +206,7 @@ networks:
 
 Here **external flag** is used to connect to a network which is already created.
 
-Now go to the **http://<localhost_or_your_ip>:81** for nginx proxy manager dashboard.
+Now go to the **http://\<localhost_or_your_ip>:81** for nginx proxy manager dashboard.
 
 ## <u>Adding SSL Certificate</u>
 
@@ -366,9 +376,7 @@ mkdir -p etc/traefik
 
 Then create a traefik.yml file in /traefik/etc/traefik folder.
 
-This is static configuration for traefik. It will use this at the start of traefik container.
-
-If you want any dynamic configuration then add a config.yml file in /traefik/etc/traefik folder. This is used for any other networking services that we need. (Also to communicate with services that don't use docker cotainer.)
+This is a **static configuration** for traefik. It will use this at the start of traefik container.
 
 ```yaml
 global:
@@ -465,6 +473,42 @@ log:
   filePath: "/var/log/traefik/traefik.log"
 accessLog:
   filePath: "/var/log/traefik/access.log"
+```
+
+If you want any **dynamic configuration** then add a _config.yml_ file in /traefik/etc/traefik folder. This is used for any other networking services that we need. (Also to communicate with services that don't use docker cotainer.)
+
+This is an example of _config.yml_ file. Traefik will watch for changes in this file and reload the configuration. This file is not necessary.
+
+```yaml
+# http routing section
+http:
+  routers:
+    # Define a connection between requests and services
+    to-whoami:
+      entryPoints:
+        - "websecure"
+      rule:
+        "Host(`example.com`) && PathPrefix(`/whoami/`)"
+        # If the rule matches, applies the middleware
+      middlewares:
+        - test-user
+      tls: {}
+      # If the rule matches, forward to the whoami service (declared below)
+      service: whoami
+
+middlewares:
+  # Define an authentication mechanism
+  test-user:
+    basicAuth:
+      users:
+        - test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/
+
+services:
+  # Define how to reach an existing service on our infrastructure
+  whoami:
+    loadBalancer:
+      servers:
+        - url: http://<private-ip>:8000
 ```
 
 Now add a certs folder in this /traefik/etc/traefik folder.
