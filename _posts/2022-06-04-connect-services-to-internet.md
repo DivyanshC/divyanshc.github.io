@@ -173,7 +173,7 @@ Then check if docker created our network.
 docker network list
 ```
 
-It will show the network name as **<FOLDER_NAME>\_npm**.
+It will show the network name as **\<FOLDER_NAME>\_npm**.
 
 ```
 name : nginx_proxy_manager_npm
