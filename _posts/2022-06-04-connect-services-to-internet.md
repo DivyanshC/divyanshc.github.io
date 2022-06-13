@@ -1,5 +1,5 @@
 ---
-title: Connecting services to internet using encrypted methods
+title: Connecting services to internet using reverse proxy
 date: 2022-06-04 16:33:00 +0530
 categories:
   [
@@ -31,6 +31,12 @@ tags: [
     tls,
     email,
     forward,
+    caddy,
+    reverse,
+    proxy,
+    connect,
+    cloudflared-tunnel,
+    tunnel,
   ] # tag names should always be lowercase
 ---
 
@@ -130,11 +136,95 @@ Then try restarting the cloudflared service again.
 
 # 2. Reverse Proxy Manager
 
-There are many reverse proxy managers available like **nginx proxy manager**, **traefik** etc.
+There are many reverse proxy managers available like **caddy**, **nginx proxy manager**, **traefik** etc.
 
 For this you will need your domain or subdomain to point to your server's IP address. See this [DNS Entry section](#dns-entry).
 
-## 1. Installing Nginx Proxy Manager
+## 1. Caddy
+
+- Open the installation page [here](https://caddyserver.com/docs/install). If you want to install on the host machine. We will use docker for this.
+
+- Use _docker-compose.yml_ as mentioned below. (Make a directory named caddy and copy the file to that directory)
+
+```yaml
+version: "3.7"
+
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      # - $PWD/site:/srv
+      - ./caddy_data:/data
+      - ./caddy_config:/config
+      - ./certs:/etc/certs/origin_cloudflare
+```
+
+It's very simple with caddy just add the following to your **Caddyfile**.
+
+```
+#{
+#	acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+#}
+
+caddy.example.com {
+	#tls /etc/certs/origin_cloudflare/ssl_origin_certificate.cert /etc/certs/origin_cloudflare/ssl_origin_certificate_key.pem
+	reverse_proxy nginx:80
+}
+```
+
+- Run command in your terminal to run the caddy docker.
+
+  ```bash
+  docker-compose up -d --force-recreate
+  ```
+
+- We will use **nginx** as an example here. First we will create a nginx docker.
+
+```yaml
+version: "3"
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    # ports:
+    #   - "1080:80"
+    networks:
+      - caddy_default
+
+networks:
+  caddy_default:
+    external: True
+```
+
+- Don't use **proxy** when adding **DNS record** to **cloudflare** when first getting **letsenrypt** certificate. (It needs to check if domain is _pointing_ to the server ip or not, You can after certificate is obtained)
+
+- Caddy will **automatically** generate a SSL certificate for you from the **Let's Encrypt** server. (Make sure you have ports 80 and 443 open in your firewall or your server vnc because by default it uses http challenge to get the certificate.)
+
+- First try with **staging SSL** certificate by using the following command at the top of caddyfile. If everything work fine then comment out the following line as showing in our caddyfile. (We are using staging SSL certificate here because there is a _rate limit_ for _production SSL_ certificate.)
+
+  ```
+  {
+    acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+  }
+  ```
+
+- If you want to use **custom SSL** certificate then use the following line.
+
+  ```
+  tls /etc/certs/origin_cloudflare/ssl_origin_certificate.cert /etc/certs/origin_cloudflare/ssl_origin_certificate_key.pem
+  ```
+
+- To get _custom_ certificates from cloudflare check [this](#2-through-cloudflare)
+
+## 2. Installing Nginx Proxy Manager
 
 - Open the [ installation guide](https://nginxproxymanager.com/guide/).
 
@@ -254,7 +344,7 @@ This certificate will only last upto 3 months then we have to renew it.
 
 - Now go to nginx proxy manager dashboard and click on **SSL Certificates** > Add SSL Certificate > Custom.
 
-- Give any name, **certificate key** will be _<filename>.key_ and **certificate** will be _<filename>.pem_ > Click on Save. It will take some time to generate the certificate.
+- Give any name, **certificate key** will be _\<filename>.key_ and **certificate** will be _\<filename>.pem_ > Click on Save. It will take some time to generate the certificate.
 
 ### <u>Adding a service to a domain or subdomain</u>
 
@@ -276,7 +366,7 @@ docker inspect <CONTAINER_NAME_OR_ID> | grep '"IPAddress"' | tail -n1
 
 - Tick all the checkboxes > Got to SSL Certificates > Select the appropriate certificate > Tick all the checkboxes > Click on Save.
 
-## 2. Intalling Traefik
+## 3. Intalling Traefik
 
 This one is bit complicated because Traefik allows various implementations of configuration.
 
@@ -420,32 +510,32 @@ entryPoints:
 
 # Configure your CertificateResolver here...
 # ---
-# certificatesResolvers:
-# staging:
-#   acme:
-#     email: your_email_address_for_letsencrypt
-#     storage: /etc/traefik/certs/acme.json
-#     caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
-#     httpChallenge:
-#       entryPoint: web
+certificatesResolvers: # Don't use proxy when adding DNS record to cloudflare when first getting letsenrypt certificate (You can after certificate is obtained)
+staging: # Open ports 80 and 443 in firewall
+  acme:
+    email: your_email_address_for_letsencrypt
+    storage: /etc/traefik/certs/acme.json
+    caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
+    httpChallenge:
+      entryPoint: web
 
-# production:
-#   acme:
-#     email: your_email_address_for_letsencrypt
-#     storage: /etc/traefik/certs/acme.json
-#     caServer: "https://acme-v02.api.letsencrypt.org/directory"
-#     httpChallenge:
-#       entryPoint: web
+production: # Open ports 80 and 443 in firewall
+  acme:
+    email: your_email_address_for_letsencrypt
+    storage: /etc/traefik/certs/acme.json
+    caServer: "https://acme-v02.api.letsencrypt.org/directory"
+    httpChallenge:
+      entryPoint: web
 
-# cloudflare:
-#   acme:
-#     email: your_email_address_for_letsencrypt
-#     storage: /etc/traefik/certs/acme.json
-#     dnsChallenge:
-#       provider: cloudflare
-#       resolvers:
-#         - "1.1.1.1:53"
-#         - "1.0.0.1:53"
+cloudflare: # Open ports 80 and 443 in firewall
+  acme:
+    email: your_email_address_for_letsencrypt
+    storage: /etc/traefik/certs/acme.json
+    dnsChallenge:
+      provider: cloudflare
+      resolvers:
+        - "1.1.1.1:53"
+        - "1.0.0.1:53"
 
 # (Optional) Overwrite Default Certificates
 tls:
@@ -487,12 +577,11 @@ http:
     to-whoami:
       entryPoints:
         - "websecure"
-      rule:
-        "Host(`example.com`) && PathPrefix(`/whoami/`)"
-        # If the rule matches, applies the middleware
+      rule: "Host(`example.com`) && PathPrefix(`/whoami/`)"
+      # If the rule matches, applies the middleware
       middlewares:
         - test-user
-      tls: {}
+      tls: {} # SSL termination configuration leave empty to send this service request to http endpoint
       # If the rule matches, forward to the whoami service (declared below)
       service: whoami
 
@@ -507,7 +596,7 @@ services:
   # Define how to reach an existing service on our infrastructure
   whoami:
     loadBalancer:
-      servers:
+      servers: # use host.docker.internal instead of <private-ip> for accessing the service from the host machine
         - url: http://<private-ip>:8000
 ```
 
@@ -531,7 +620,21 @@ touch acme.json
 chmod 600 acme.json
 ```
 
-If you have obtained your coudflare SSL certificates then you can store them in the certs folder. For more info to get your cloudflare SSL certificates read this [cloudflare ssl certificate](#2-through-cloudflare).
+- Don't use **proxy** when adding **DNS record** to **cloudflare** when first getting **letsenrypt** certificate. (It needs to check if domain is _pointing_ to the server ip or not, You can after certificate is obtained)
+
+- If you want to use **letsencrypt SSL** certificates then you can use appropriate certresolver as _staging_ or _production_. (These will be stored in acme.json, if using staging as your certresolver then **delete** all contents of _acme.json_ file first then use production certresolver.)
+
+- If you want to use custom certificates then add the following lines in config.yml file.
+
+```yaml
+# Standalone TLS configuration (do not paste this under any section)
+tls: # Use this for custom SSL certs other than default one set in traefik.yml
+  certificates: # traefik will match your domain name with the certificate name
+    - certFile: /path/to/other-domain-name.cert
+      keyFile: /path/to/other-domain-name.key
+```
+
+- If you have obtained your coudflare SSL certificates then you can store them in the certs folder. For more info to get your cloudflare SSL certificates read this [cloudflare ssl certificate](#2-through-cloudflare).
 
 - `cert.cert`: contains the certificate
 - `cert-key.pem`: contains the private key
@@ -565,6 +668,7 @@ services:
       - "traefik.http.routers.nginx.entrypoints=websecure"
       - "traefik.http.routers.nginx.rule=Host(`nginx.example.com`)"
       - "traefik.http.routers.nginx.tls=true"
+      # - "traefik.http.routers.nginx.tls.certresolver=production" # use this if you want to use LetsEncrypt SSL certificates
       - "traefik.http.services.nginx.loadbalancer.server.port=80"
 
 networks:
@@ -582,6 +686,8 @@ Things to remember while creating docker-compose.yml file for a container which 
 
 - `traefik.http.routers.nginx.tls=true`: This is required to enable traefik to use SSL.
 
+- `traefik.http.routers.nginx.tls.certresolver=production`: This is required to enable traefik to use LetsEncrypt SSL certificates. (staging or production)
+
 - `traefik.http.services.nginx.loadbalancer.server.port=80`: This is required to enable traefik to send traffic to this docker container at port 80.
 
 This is the format traeffic uses to send traffic to
@@ -598,3 +704,29 @@ If you want to add a middleware like authelia for authentication before accessin
 Now the traefik map will look like this.
 
 ![traefik_map_with_middleware](/assets/traefik_map_with_middleware.png)
+
+# Connect services running on host machine from reverse proxy running in docker container
+
+- Add an _environment variable_ to your docker-compose.yml file.
+
+  ```yaml
+  extra_hosts:
+    - host.docker.internal:$HOST_GATEWAY
+  ```
+
+- Adding the following in **script.sh** file.
+
+  ```bash
+  #!/bin/bash
+
+  export HOST_GATEWAY=$(ip -4 addr show docker0 | grep -Po 'inet \K[\d.]+')
+  # docker compose up -d --force-recreate
+  ```
+
+- Run the script.sh using the following command.
+
+  ```bash
+  source ./script.sh
+  ```
+
+- Now you can access the service on your host machine from the docker container using **host.docker.internal** instead of **localhost**.
