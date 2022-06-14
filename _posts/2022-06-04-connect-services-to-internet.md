@@ -500,6 +500,8 @@ entryPoints:
     # (Optional) Redirect to HTTPS
     # ---
     http:
+      middlewares: # middleware that works for every request
+        - test-ratelimit@file
       redirections:
         entryPoint:
           to: websecure
@@ -507,6 +509,9 @@ entryPoints:
 
   websecure:
     address: :443
+    http:
+      middlewares: # middleware that works for every request
+        - test-ratelimit@file
 
 # Configure your CertificateResolver here...
 # ---
@@ -585,19 +590,26 @@ http:
       # If the rule matches, forward to the whoami service (declared below)
       service: whoami
 
-middlewares:
-  # Define an authentication mechanism
-  test-user:
-    basicAuth:
-      users:
-        - test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/
+  services:
+    # Define how to reach an existing service on our infrastructure
+    whoami:
+      loadBalancer:
+        servers: # use host.docker.internal instead of <private-ip> for accessing the service from the host machine
+          - url: http://<private-ip>:8000
 
-services:
-  # Define how to reach an existing service on our infrastructure
-  whoami:
-    loadBalancer:
-      servers: # use host.docker.internal instead of <private-ip> for accessing the service from the host machine
-        - url: http://<private-ip>:8000
+  middlewares:
+    # Here, an average of 100 requests per second is allowed.
+    # In addition, a burst of 50 requests is allowed.
+    test-ratelimit:
+      rateLimit:
+        average: 100
+        burst: 50
+
+    # Define an authentication mechanism
+    test-user:
+      basicAuth:
+        users: # set password the same as traefik dashboard
+          - test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/
 ```
 
 Now add a certs folder in this /traefik/etc/traefik folder.
@@ -629,7 +641,7 @@ chmod 600 acme.json
 ```yaml
 # Standalone TLS configuration (do not paste this under any section)
 tls: # Use this for custom SSL certs other than default one set in traefik.yml
-  certificates: # traefik will match your domain name with the certificate name
+  certificates: # traefik will match your domain name with the certificate name (without .com)
     - certFile: /path/to/other-domain-name.cert
       keyFile: /path/to/other-domain-name.key
 ```
