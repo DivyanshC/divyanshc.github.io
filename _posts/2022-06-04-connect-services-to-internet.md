@@ -719,6 +719,38 @@ Now the traefik map will look like this.
 
 # Connect services running on host machine from reverse proxy running in docker container
 
+- First check the port is open on the host machine. You can use the following command to check if port is accepting connections. (If a service is in docker container, **docker** will _automatically_ add rules to _iptables_ to allow connections to the port)
+
+  - <u>Using iptables</u>
+
+    ```bash
+    sudo iptables -S | grep <PORT_NUMBER>
+    ```
+
+    - If port is not shown in the list or it is showing **REJECT** then you can use the following command to open the port.
+
+    ```bash
+    sudo iptables -I INPUT 6 -m state --state NEW -p tcp --dport <PORT_NUMBER> -j ACCEPT
+    ```
+
+    - This iptables change will not persist after **restart**. So you can use the following command to save the changes.
+
+    ```bash
+    sudo netfilter-persistent save
+    ```
+
+  - <u>Using ufw firewall</u>
+
+    ```bash
+    sudo ufw status
+    ```
+
+    - If port is not shown in the list or it is showing **deny** then you can use the following command to open the port.
+
+    ```bash
+    sudo ufw allow <PORT_NUMBER>
+    ```
+
 - Add an _environment variable_ to your docker-compose.yml file.
 
   ```yaml
