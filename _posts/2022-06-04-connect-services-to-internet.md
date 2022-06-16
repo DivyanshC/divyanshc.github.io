@@ -60,6 +60,8 @@ If your apex domain point to a server, you also want your subdomain to point to 
 
 It is the easiest of them all.
 
+There is no need to open any ports or do any port forwarding for the router.
+
 - Go to Cloudflare [dashboard](https://dash.cloudflare.com/)
 
 - Select your domain > click on access tab and then click on [**Launch Zero Trust**](https://dash.teams.cloudflare.com/).
@@ -139,6 +141,8 @@ Then try restarting the cloudflared service again.
 There are many reverse proxy managers available like **caddy**, **nginx proxy manager**, **traefik** etc.
 
 For this you will need your domain or subdomain to point to your server's IP address. See this [DNS Entry section](#dns-entry).
+
+Respective ports should be opened and port forwarding has to be done for the router.
 
 ## 1. Caddy
 
