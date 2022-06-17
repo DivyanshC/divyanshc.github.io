@@ -638,7 +638,7 @@ chmod 600 acme.json
 
 - Don't use **proxy** when adding **DNS record** to **cloudflare** when first getting **letsenrypt** certificate. (It needs to check if domain is _pointing_ to the server ip or not, You can after certificate is obtained)
 
-- If you want to use **letsencrypt SSL** certificates then you can use appropriate certresolver as _staging_ or _production_. (These will be stored in acme.json, if using staging as your certresolver then **delete** all contents of _acme.json_ file first then use production certresolver.)
+- If you want to use **letsencrypt SSL** certificates then you can use the appropriate certresolver as _staging_ or _production_. (These will be stored in acme.json, if using staging as your certresolver then **delete** all contents of _acme.json_ file first then use production certresolver.)
 
 - If you want to use custom certificates then add the following lines in config.yml file.
 

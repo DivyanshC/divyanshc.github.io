@@ -32,7 +32,7 @@ Cloudflare will show **Cloudflare is now protecting your site** in the dashboard
 
 Then go into DNS and you can see the **nameservers** we added will show up unser nameservers section.
 
-Now in **DNS** section, if you have some a records pointing to some ip address then delete them and then create new a records and point them to your **servers ip addresses**.
+Now in **DNS** section, if you have some **A** records pointing to some IP address then delete them and then create new **A** records and point them to your **servers ip addresses**.
 
 ## SSL/TLS Section
 
