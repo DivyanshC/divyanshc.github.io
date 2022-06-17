@@ -5,15 +5,34 @@ categories: [homelab, domain, cloudflare, traefik, authelia]
 tags: [homelab, domain, cloudflare, traefik, authelia, sso, totp] # tag names should always be lowercase
 ---
 
-# Adding Single Sign On and TOTP using Authelia middleware for traefik
+# Adding Single Sign On and 2 Factor Auth (TOTP) using Authelia middleware for traefik
 
+## Traefik
+
+- You can check this [section]({% link _posts/2022-06-04-connect-services-to-internet.md %}#3-intalling-traefik) on how to install **traefik**.
 
 ## Authelia
+
+- Add a DNS record for _auth.example.com_ pointing to the server running **traefik**.
+
+- This is how your directory for authelia will look like:
+
+  ```
+  authelia/
+  ├── config
+  │   ├── configuration.yml
+  │   ├── db.sqlite3
+  │   ├── notification.txt
+  │   └── users_database.yml
+  └── docker-compose.yml
+
+  1 directory, 5 files
+  ```
 
 - Use _docker-compose.yml_ as mentioned below. (Make a directory named authelia and copy the file to that directory)
 
 ```yaml
-version: '3'
+version: "3"
 
 services:
   authelia:
@@ -24,13 +43,13 @@ services:
     networks:
       - traefik_default
     labels:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.authelia.rule=Host(`auth.example.com`)'
-      - 'traefik.http.routers.authelia.entrypoints=websecure'
-      - 'traefik.http.routers.authelia.tls=true'
-      - 'traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://auth.example.com'
-      - 'traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true'
-      - 'traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
+      - "traefik.enable=true"
+      - "traefik.http.routers.authelia.rule=Host(`auth.example.com`)"
+      - "traefik.http.routers.authelia.entrypoints=websecure"
+      - "traefik.http.routers.authelia.tls=true"
+      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/verify?rd=https://auth.example.com"
+      - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
     # expose:
     #   - 9091
     restart: unless-stopped
@@ -45,7 +64,7 @@ networks:
 
 - Create a config folder inside authelia main folder.
 
-- Add the below yaml to configuration.yml file.
+- Add the below yaml to configuration.yml file in config folder.
 
 ```yaml
 ---
@@ -87,20 +106,20 @@ access_control:
     # Rules applied to everyone
     - domain: a.example.com
       policy: bypass
-    - domain: 
-      - example.com
+    - domain:
+        - example.com
       subject:
-       - "user:<Username>"
-       - "user:<Username>"
-       #- "group:<Group_Name>"
-       #- "group:<Group_Name>"
-       # [,] this is AND above one is OR
+        - "user:<Username>"
+        - "user:<Username>"
+        #- "group:<Group_Name>"
+        #- "group:<Group_Name>"
+        # [,] this is AND above one is OR
       policy: one_factor
-    - domain: 
-      - b.example.com
-      - c.example.com
+    - domain:
+        - b.example.com
+        - c.example.com
       subject:
-       - "user:<Username>"
+        - "user:<Username>"
       policy: two_factor
     # - domain: pve1.local.example.com
     #   policy: two_factor
@@ -141,7 +160,9 @@ notifier:
     filename: /config/notification.txt
 ```
 
-- Add the below yaml to users_database.yml file.
+- You will get forgot password, **TOTP** genration link in your email if you have configured an email notifier. If you have not configured an email notifier, you will get a link in your _/config/notification.txt_. Same goes for the other **notifications** like _2 Factor Auth (TOTP)_.
+
+- Add the below yaml to users_database.yml file to config folder.
 
 ```yaml
 ---
@@ -155,7 +176,7 @@ notifier:
 users:
   username_1:
     displayname: "name_1"
-    # Password is Authelia
+    # Password is Authelia, generate your own hash using argon2id algorithm
     password: "$argon2id$v=19$m=65536,t=1,p=8$cUI4a0E3L1laYnRDUXl3Lw$ZsdsrdadaoVIaVj8NltA8x4qVOzT+/r5GF62/bT8OuAs"
     email: <email>
       - admins_group
@@ -163,8 +184,59 @@ users:
 
   username_2:
     displayname: "name_2"
-    # Password is Authelia
+    # Password is Authelia, generate your own hash using argon2id algorithm
     password: "$argon2id$v=19$m=65536,t=1,p=8$cUI4a0E3L1laYnRDUXl3Lw$ZsdsrdadaoVIaVj8NltA8x4qVOzT+/r5GF62/bT8OuAs"
     email: <email>
       - dashboard
+```
+
+- Generate the **hashed password** for _users_ using the following command.
+
+```bash
+docker run authelia/authelia:latest authelia hash-password 'yourpassword'
+```
+
+- Replace the **password** with the _generated_ hash.
+
+## Enable authelia for services
+
+### <u>Docker</u>
+
+- Add the below line to docker-compose.yml file for the docker service you want to get behind authentication.
+
+```yaml
+labels:
+  - "traefik.http.routers.traefik.middlewares=authelia@docker"
+```
+
+### <u>Services outside docker</u>
+
+- Below shown is an example of how to enable authelia for services outside docker. You have to add the below line to your traefik's config file.
+
+```yaml
+middlewares:
+  #order matters
+  authelia:
+    forwardAuth:
+      address: "http://authelia:9091/api/verify?rd=https://auth.example.com"
+```
+
+- Now add this middleware to your service's routers section. Check this [section]({% link _posts/2022-06-04-connect-services-to-internet.md %}#3-intalling-traefik) for more details.
+
+- Example:
+
+```yaml
+http:
+  routers:
+    # Define a connection between requests and services
+    to-whoami:
+      entryPoints:
+        - "websecure"
+      rule: "Host(`example.com`) && PathPrefix(`/whoami/`)"
+      # If the rule matches, applies the middleware
+      middlewares:
+        - authelia
+        - test-user
+      tls: {}
+      service: whoami
 ```
