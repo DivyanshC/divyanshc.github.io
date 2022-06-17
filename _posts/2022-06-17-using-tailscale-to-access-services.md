@@ -154,7 +154,7 @@ volumes:
   - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock:ro
 ```
 
-- This **tailscaled.sock** will eanble to get SSL **automatically** and **renew** the certificate **automatically**.
+- This **tailscaled.sock** will enable to get SSL **automatically** and **renew** the certificate **automatically**.
 
 - Now the docker-compose.yml for vaultwarden will be the following:
 
