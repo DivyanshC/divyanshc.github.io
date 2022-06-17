@@ -77,6 +77,8 @@ tags: [
 
 - You can also use [authelia]({% link _posts/2022-06-16-adding-authentication-to-services.md %}) to connect vaultwarden to internet for extra security. (But by using authelia you will not able to connect your extension or apps to your vaultwarden service.)
 
+- Add `https://machine-name.domain-alias.ts.net` to your _SELF-HOSTED ENVIRONMENT > Server URL_ on your **vaultwarden apps** and **browser extension** to access your service.
+
 ### 1. Traefik
 
 - Create a folder **vaultwarden** and add this _docker-compose.yml_ file.
@@ -199,5 +201,3 @@ machine-name.domain-alias.ts.net {
   ```
 
 - This will allow **caddy** to **access** _tailscaled.sock_ file to obtain **SSL** certificates.
-
-- Add `https://machine-name.domain-alias.ts.net` to your _SELF-HOSTED ENVIRONMENT > Server URL_ on your **vaultwarden apps** and **browser extension** to access your service.
