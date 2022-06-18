@@ -9,7 +9,7 @@ tags: [homelab, domain, cloudflare, traefik, authelia, sso, totp] # tag names sh
 
 ## Traefik
 
-- You can check this [section]({% link _posts/2022-06-04-connect-services-to-internet.md %}#3-intalling-traefik) on how to install **traefik**.
+- You can check this [section]({% link _posts/2022-06-04-connect-services-to-internet.md %}#3-installing-traefik) on how to install **traefik**.
 
 ## Authelia
 
@@ -221,7 +221,7 @@ middlewares:
       address: "http://authelia:9091/api/verify?rd=https://auth.example.com"
 ```
 
-- Now add this middleware to your service's routers section. Check this [section]({% link _posts/2022-06-04-connect-services-to-internet.md %}#3-intalling-traefik) for more details.
+- Now add this middleware to your service's routers section. Check this [section]({% link _posts/2022-06-04-connect-services-to-internet.md %}#3-installing-traefik) for more details.
 
 - Example:
 
