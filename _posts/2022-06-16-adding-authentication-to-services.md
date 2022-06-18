@@ -236,7 +236,7 @@ http:
       # If the rule matches, applies the middleware
       middlewares:
         - authelia
-        - test-user
+        - services-user
       tls: {}
       service: whoami
 ```

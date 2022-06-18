@@ -370,7 +370,7 @@ docker inspect <CONTAINER_NAME_OR_ID> | grep '"IPAddress"' | tail -n1
 
 - Tick all the checkboxes > Got to SSL Certificates > Select the appropriate certificate > Tick all the checkboxes > Click on Save.
 
-## 3. Intalling Traefik
+## 3. Installing Traefik
 
 This one is bit complicated because Traefik allows various implementations of configuration.
 
@@ -505,7 +505,7 @@ entryPoints:
     # ---
     http:
       middlewares: # middleware that works for every request
-        - test-ratelimit@file
+        - services-ratelimit@file
       redirections:
         entryPoint:
           to: websecure
@@ -515,7 +515,7 @@ entryPoints:
     address: :443
     http:
       middlewares: # middleware that works for every request
-        - test-ratelimit@file
+        - services-ratelimit@file
 
 # Configure your CertificateResolver here...
 # ---
@@ -589,7 +589,7 @@ http:
       rule: "Host(`example.com`) && PathPrefix(`/whoami/`)"
       # If the rule matches, applies the middleware
       middlewares:
-        - test-user
+        - services-user
       tls: {} # SSL termination configuration leave empty to send this service request to http endpoint
       # If the rule matches, forward to the whoami service (declared below)
       service: whoami
@@ -604,16 +604,16 @@ http:
   middlewares:
     # Here, an average of 100 requests per second is allowed.
     # In addition, a burst of 50 requests is allowed.
-    test-ratelimit:
+    services-ratelimit:
       rateLimit:
         average: 100
         burst: 50
 
     # Define an authentication mechanism
-    test-user:
+    services-user:
       basicAuth:
-        users: # set password the same as traefik dashboard
-          - test:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/
+        users: # Replace **USER:BASIC_AUTH_PASSWORD** with the generated string
+          - USER:$apr1$H6uskkkW$IgXLP6ewTrSuBkTrqE8wj/
 ```
 
 Now add a certs folder in this /traefik/etc/traefik folder.
