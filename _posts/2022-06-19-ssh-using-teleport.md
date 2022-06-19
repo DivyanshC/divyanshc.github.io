@@ -1,5 +1,5 @@
 ---
-title: Access servers using teleport, tailscale, cloudflare
+title: Access servers securely using teleport, tailscale, cloudflare
 date: 2022-06-19 17:18:00 +0530
 categories: [homelab, domain, cloudflare]
 tags: [homelab, domain, cloudflare, sso, totp, security] # tag names should always be lowercase
