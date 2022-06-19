@@ -61,7 +61,7 @@ networks:
     external: True
 ```
 
-- Add this _teleport.yaml_ file in /teleport/config folder.
+- Add this _teleport.yaml_ file in /teleport/config folder. For more details, check [this link](https://goteleport.com/docs/setup/reference/config/)
 
 ```yaml
 version: v2
