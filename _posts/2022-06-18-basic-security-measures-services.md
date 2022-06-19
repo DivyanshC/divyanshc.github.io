@@ -17,9 +17,17 @@ tags: [
   ] # tag names should always be lowercase
 ---
 
+## Cloudflare
+
+- Choose **cloudflare proxy** whenever you are **pointing** a **domain** to a **service**. It will show the **IP** of cloudflare **proxy** instead of our **server**.
+
 ## Ports
 
 - Only **open ports** that are **required** for the **service**.
+
+## SSH
+
+- Use [**tailscale**]({% link _posts/2022-06-17-using-tailscale-to-access-services.md %}) for **SSH**.
 
 ## Traefik
 
@@ -123,6 +131,18 @@ entryPoints:
 - You can add multiple middlewares to the **entryPoint**. Remember that **order** of the middlewares is **important**.
 
 ## Adding crowdsec middleware to traefik
+
+- Directly structure will look like this:
+
+```txt
+crowdsec/
+├── config
+│   └── acquis.yaml
+├── docker-compose.yml
+└── update_and_upgrade.sh
+
+3 directories, 2 files
+```
 
 - Create a folder **crowdsec** and add this _docker-compose.yml_ file.
 
