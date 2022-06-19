@@ -1,8 +1,18 @@
 ---
 title: Access servers securely using teleport, tailscale, cloudflare
 date: 2022-06-19 17:18:00 +0530
-categories: [homelab, domain, cloudflare]
-tags: [homelab, domain, cloudflare, sso, totp, security] # tag names should always be lowercase
+categories: [homelab, domain, cloudflare, teleport, caddy, tailscale]
+tags: [
+    homelab,
+    domain,
+    cloudflare,
+    sso,
+    totp,
+    security,
+    teleport,
+    caddy,
+    tailscale,
+  ] # tag names should always be lowercase
 ---
 
 ## Cloudflared Proxy
