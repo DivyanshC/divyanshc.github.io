@@ -208,7 +208,7 @@ proxy_service:
 
 ## Using Caddy for SSL, Teleport over tailscale for accessing it over private vpn network
 
-- Install **Caddy** from [page]({% link _posts/2022-06-04-connect-services-to-internet.md%}#1-caddy}).
+- Install **Caddy** from [page]({% link _posts/2022-06-04-connect-services-to-internet.md%}#1-caddy).
 
 - Add the following line to the _Caddyfile_ file:
 
