@@ -157,6 +157,7 @@ services:
       TZ: "Asia/Kolkata"
       GID: "${GID-1000}"
       COLLECTIONS: "crowdsecurity/linux crowdsecurity/traefik"
+      POSTOVERFLOWS: "crowdsecurity/cdn-whitelist"
     # depends_on:  #uncomment if running traefik in the same compose file
     #   - 'traefik'
     volumes:
@@ -278,7 +279,25 @@ entryPoints:
   docker exec crowdsec cscli metrics
   ```
 
-- To see banned IPs use the following command:
+- To see **status** of **collections, parsers, postoverflows** etc use the following command:
+
+  ```bash
+  docker exec crowdsec cscli hub list
+  ```
+
+- To see **alerts** list use the following command:
+
+  ```bash
+  docker exec crowdsec cscli alerts list
+  ```
+
+- To inspect **alerts** use the following command:
+
+  ```bash
+  docker exec crowdsec cscli alerts inspect -d <alert-id>
+  ```
+
+- To see **banned** IPs use the following command:
 
   ```bash
   docker exec crowdsec cscli decisions list
